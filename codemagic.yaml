@@ -1,0 +1,51 @@
+workflows:
+  ios-ipa:
+    name: Solar Calculator iOS IPA
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: true
+
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.sscodeaxis.solar
+      vars:
+        BUNDLE_ID: com.sscodeaxis.solar
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+
+    cache:
+      cache_paths:
+        - $HOME/.pub-cache
+        - $HOME/Library/Caches/CocoaPods
+
+    scripts:
+      - name: Get Flutter packages
+        script: flutter pub get
+
+      - name: Install CocoaPods dependencies
+        script: |
+          cd ios
+          pod install --repo-update
+
+      - name: Apply provisioning profiles
+        script: xcode-project use-profiles
+
+      - name: Build signed IPA
+        script: |
+          flutter build ipa --release \
+            --build-number="$PROJECT_BUILD_NUMBER" \
+            --export-options-plist=/Users/builder/export_options.plist
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
