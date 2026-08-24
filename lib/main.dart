@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'logic/solar_provider.dart';
-import 'ui/solar_calculator_screen.dart';
+import 'state/equipment_library_provider.dart';
+import 'state/project_provider.dart';
+import 'state/settings_provider.dart';
+import 'state/tab_controller.dart';
+import 'theme/solar_theme.dart';
+import 'ui/app_root.dart';
 
 void main() {
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => SolarProvider(),
-      child: const SolarCalculatorApp(),
-    ),
-  );
+  runApp(const SolarCalculatorApp());
 }
 
 class SolarCalculatorApp extends StatelessWidget {
@@ -17,25 +16,25 @@ class SolarCalculatorApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Solar Calculator',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF6750A4),
-          brightness: Brightness.light,
-        ),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ProjectProvider()),
+        ChangeNotifierProvider(create: (_) => SolarTabController()),
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
+        ChangeNotifierProvider(create: (_) => EquipmentLibraryProvider()),
+      ],
+      child: Consumer<SettingsProvider>(
+        builder: (context, settings, _) {
+          return MaterialApp(
+            title: 'Solar Calculator',
+            debugShowCheckedModeBanner: false,
+            theme: SolarTheme.light(),
+            darkTheme: SolarTheme.dark(),
+            themeMode: settings.themeMode,
+            home: const AppRoot(),
+          );
+        },
       ),
-      darkTheme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF6750A4),
-          brightness: Brightness.dark,
-        ),
-      ),
-      themeMode: ThemeMode.system,
-      home: const SolarCalculatorScreen(),
     );
   }
 }
