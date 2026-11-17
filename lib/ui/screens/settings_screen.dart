@@ -237,9 +237,12 @@ class SettingsScreen extends StatelessWidget {
       );
       final file = File('${dir.path}/${name}_solar_project.json');
       await file.writeAsString(json);
-      await Share.shareXFiles([
-        XFile(file.path),
-      ], subject: 'Solar project export');
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path)],
+          subject: 'Solar project export',
+        ),
+      );
     } catch (_) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -260,8 +263,8 @@ class SettingsScreen extends StatelessWidget {
         type: FileType.custom,
         allowedExtensions: ['json'],
       );
-      if (result == null || result.files.single.path == null) return;
-      final file = File(result.files.single.path!);
+      if (result.isEmpty || result.first.path == null) return;
+      final file = File(result.first.path!);
       final content = await file.readAsString();
       final imported = await provider.importProjectJson(content);
       if (context.mounted) {

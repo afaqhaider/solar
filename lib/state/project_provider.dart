@@ -869,7 +869,12 @@ class ProjectProvider extends ChangeNotifier {
     text +=
         '\n\nEstimates only — actual requirements vary with equipment and conditions.';
 
-    Share.share(text, subject: 'Solar System Estimate — ${rec.projectName}');
+    SharePlus.instance.share(
+      ShareParams(
+        text: text,
+        subject: 'Solar System Estimate — ${rec.projectName}',
+      ),
+    );
   }
 
   /// A short, spam-free plain-text summary suitable for the native share
@@ -890,7 +895,9 @@ class ProjectProvider extends ChangeNotifier {
         'Inverter Planning Capacity: ${Units.formatWatts(inverter.recommendedInverterW)}\n\n'
         'Generated using Solar Calculator.';
 
-    Share.share(text, subject: 'Solar Project: ${rec.projectName}');
+    SharePlus.instance.share(
+      ShareParams(text: text, subject: 'Solar Project: ${rec.projectName}'),
+    );
   }
 
   // ---- Project workspace details (description, notes, status, etc.) ----
